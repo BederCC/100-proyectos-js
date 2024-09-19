@@ -75,12 +75,27 @@
             ) {
                 dx = -dx;
             }
-            //rebotar en la parte de arriba
+            //pelota rebotar en la parte de arriba
             if(y + dy < ballRadius) {
                 dy = -dy;
             } 
 
-            if(y + dy > canvas.height - ballRadius) {
+            //pelota toca la paleta
+            const isBallSameXAsPaddle = 
+                x > paddleX && 
+                x < paddleX + paddleWidth;
+
+            const isBallTouchingPaddle =
+                y + dy > paddleY;
+            
+            if(isBallSameXAsPaddle && isBallTouchingPaddle) {
+                //pelota toca la paleta
+                dy = -dy;
+            }
+            //pelota toca el suelo
+            else if(
+                y + dy > canvas.height - ballRadius
+            ) {
                 //si la pelota toca el fondo del canvas
                 //alert('Game Over');
                 document.location.reload();
