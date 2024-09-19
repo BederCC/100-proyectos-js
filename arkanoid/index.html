@@ -13,14 +13,21 @@
             border-bottom:  transparent;
             display: block;
             margin: 0 auto;
-            background-color: #000;
+            background: url('./src/bkg.png');
         }
     </style>
 </head>
 <body>
     <canvas></canvas>
+
+    <img hidden id="sprite" src="./src/sprite.png" alt="Sprites Arkanoid">
+    <img hidden id="bricks" src="./src/bricks.png" alt="Sprites bricks Arkanoid">
+    
     <script>
         const canvas = document.querySelector('canvas');
+        const $sprite = document.querySelector('#sprite');
+        const $bricks = document.querySelector('#bricks');
+
         const ctx = canvas.getContext('2d');
         canvas.width = 448;
         canvas.height = 400;
@@ -161,7 +168,7 @@
 
             window.requestAnimationFrame(draw);
         }
-        // video 33:25
+        // video 55:36
         draw();
         initEvents();
     </script>
