@@ -54,7 +54,40 @@
         let rightPressed = false;
         let leftPressed = false;
 
-        const PADDLE_SENSIBILITY = 7;
+        //variables de los ladrillos
+        const brickRowCount = 6;
+        const brickColumnCount = 13;
+        const brickWidth = 32;
+        const brickHeight = 16;
+        const brickPadding = 0;
+        const brickOffsetTop = 80;
+        const brickOffsetLeft = 15;
+        const bricks = [];
+
+        const BRICKS_STATUS = {
+            ACTIVE: 1,
+            DESTROYED: 0,
+        }
+
+        for(let c = 0; c < brickColumnCount; c++) {
+            bricks[c] = [];//inicializar el array vacio
+            for(let r = 0; r < brickRowCount; r++) {
+                //crear un nuevo objeto ladrillo en pantalla
+                const brickX = (c * (brickWidth + brickPadding)) + brickOffsetLeft;
+                const brickY = (r * (brickHeight + brickPadding)) + brickOffsetTop;
+                //asignar un color aleatorio al ladrillo 
+                const randomColor = Math.floor(Math.random() * 8);
+                //este truco es importante que lo tengas en la memoria
+                //guardamos la informacion de cada ladrillo
+                bricks[c][r] = { x: brickX, 
+                    y: brickY, 
+                    status: BRICKS_STATUS.ACTIVE,
+                    color: randomColor
+                };
+            }
+        }
+
+        const PADDLE_SENSIBILITY = 5;
 
         function drawBall() {
             ctx.beginPath();
@@ -64,17 +97,70 @@
             ctx.closePath(); //terminar el trazado
         }
         function drawPaddle() {
-            ctx.fillStyle = 'green';
-            ctx.fillRect(
+            
+
+            ctx.drawImage(
+                //la imagen
+                $sprite,
+                //coordenadas de la imagen
+                29,//coordenada x del clip coordenadas de recorte
+                174,//coordenada y del clip coordenadas de recorte
+                paddleWidth, //alto del clip
+                paddleHeight, //ancho del clip
+                //coordenadas del canvas
                 paddleX, //coordenada x
                 paddleY, //coordenada y
-                paddleWidth, //el ancho del dibujo
-                paddleHeight //el alto del dibujo
-            );
+                paddleWidth,//el ancho del clip
+                paddleHeight //el aalto del clip
+                
+            )
         }
-        function drawBricks() {}
+        function drawBricks() {
+            for(let c = 0; c < brickColumnCount; c++) {
+                for(let r = 0; r < brickRowCount; r++) {
+                    const currentBrick = bricks[c][r];
+                    if(currentBrick.status === BRICKS_STATUS.ACTIVE) {
+                        ctx.drawImage(
+                            $bricks,
+                            currentBrick.color * brickWidth,
+                            1,
+                            brickWidth,
+                            brickHeight,
+                            currentBrick.x,
+                            currentBrick.y,
+                            brickWidth,
+                            brickHeight
+                        );
+                    }
+                }
+            }
+        }
 
-        function collisionDetection() {}
+        function collisionDetection() {
+            for(let c = 0; c < brickColumnCount; c++) {
+                for(let r = 0; r < brickRowCount; r++) {
+                    const currentBrick = bricks[c][r];
+                    if(currentBrick.status === BRICKS_STATUS.ACTIVE) {
+                        if(
+                            x > currentBrick.x && 
+                            x < currentBrick.x + brickWidth &&
+                            y > currentBrick.y &&
+                            y < currentBrick.y + brickHeight
+                        ) {
+                            dy = -dy;
+                            currentBrick.status = BRICKS_STATUS.DESTROYED;
+                            counter++;
+                            if(counter === brickRowCount * brickColumnCount) {
+                                alert('YOU WIN, CONGRATULATIONS!');
+                                document.location.reload();
+                                clearInterval(interval);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         function ballMovement() {
             if(
                 x + dx > canvas.width - ballRadius || //pared derecha
