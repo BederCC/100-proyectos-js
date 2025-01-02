@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Game</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            --green: #00ff00;
+            --red: #ff0000;
+            --blue: #0000ff;
+            --yellow: #ffff00;
+            --purple: #800080;
+            --orange: #ffa500;
+            --pink: #ff69b4;
+            --brown: #a52a2a;
+            --white: #ffffff;
+            --black: #000000;
+            --gray: #808080;
+            --lightgray: #d3d3d3;
+            --darkgray: #a9a9a9;
+        }
+        body{
+            background: var(--black);
+            font-family: Menlo, monospace;
+            display: grid;
+            padding: 32px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <section id="game">
+            <time>30</time>
+            <p></p>
+            <input autofocus>
+        </section>
+    </main>
+</body>
+<script>
+    const $time = document.querySelector('time');
+    const $paragraph = document.querySelector('p');
+    const $input = document.querySelector('input');
+
+    const INITIAL_TIME = 30;
+
+    const TEXT = 'Lorem ipsum dolor sit amet consectetur adipisicing elit Quisquam, quibusdam. Quo, quod.';
+
+    let words = [];
+    let currentTime = INITIAL_TIME;
+
+    initGame();
+    initEvents();
+
+    function initGame() {
+        words = TEXT.split(' ').slice(0, 32);
+        currentTime = INITIAL_TIME;
+
+        $time.textContent = currentTime;
+
+        $paragraph.innerHTML = words.map((word, index) => {
+            const letters = word.split('');
+            return `<word>
+                ${letters
+                    .map(letter => `<letter>${letter}</letter>`)
+                    .join('')
+                }
+            </word>`;
+        }).join(' ');
+    }
+</script>
+</html>
