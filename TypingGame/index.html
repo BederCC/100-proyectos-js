@@ -29,6 +29,60 @@
             justify-content: center;
             margin-top: 16px;
         }
+        section{
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-width: 500px;
+        }
+        input{
+            z-index: -999;
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        p{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px 8px;
+            margin: 0;
+        }
+        letter{
+            color: var(--gray);
+            position: relative;
+
+            &.active::before{
+                content: '|';
+                color: var(--green);
+                font-size: 14px;
+                position: absolute;
+                left: -65%;
+                animation: 1s blink infinite ease-in-out;
+            }
+
+            &.active.is-last::before{
+                left: 65%;
+            }
+
+            &.correct{
+                color: var(--green);
+            }
+
+            &.incorrect{
+                color: var(--red);
+            }
+        }
+
+        @keyframes blink {
+            0%, 25% {
+                opacity: 1;
+            }
+            75% {
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 
@@ -48,7 +102,7 @@
 
     const INITIAL_TIME = 30;
 
-    const TEXT = 'Lorem ipsum dolor sit amet consectetur adipisicing elit Quisquam, quibusdam. Quo, quod.';
+    const TEXT = 'lorem ipsum dolor sit amet consectetur adipisicing elit Quisquam, quibusdam. Quo, quod.';
 
     let words = [];
     let currentTime = INITIAL_TIME;
@@ -71,6 +125,81 @@
                 }
             </word>`;
         }).join(' ');
+
+        const $firstWord = $paragraph.querySelector('word');
+        $firstWord.classList.add('active');
+        $firstWord.querySelector('letter').classList.add('active');
+
+        const intervalId = setInterval(() => {
+            currentTime--;
+            $time.textContent = currentTime;
+            if (currentTime === 0) {
+                clearInterval(intervalId);
+                gameOver();
+            }
+        }, 1000);
+    }
+    function initEvents() {
+        document.addEventListener('keydown', () => {
+            $input.focus();
+        })
+        $input.addEventListener('keydown', oneKeyDown)
+        $input.addEventListener('keyup', oneKeyUp)
+    }
+
+    function oneKeyDown(event) {
+        const $currentWord = $paragraph.querySelector('word.active');
+        const $currentLetter = $currentWord.querySelector('letter.active');
+
+        const { key } = event;
+        if (key === ' ') {
+            event.preventDefault();
+
+            const $nextWord = $currentWord.nextElementSibling;
+            const $nextLetter = $nextWord.querySelector('letter');
+
+            $currentWord.classList.remove('active');
+            $currentLetter.classList.remove('active');
+        }
+    }
+
+    function oneKeyUp() {
+        //recuperamos los elementos actuales
+        const $currentWord = $paragraph.querySelector('word.active');
+        const $currentLetter = $currentWord.querySelector('letter.active');
+
+        const currentWord = $currentWord.innerText.trim();
+        $input.maxLength = currentWord.length;
+        console.log({value : $input.value, currentWord});
+
+        const $allLetters = $currentWord.querySelectorAll('letter');
+
+        $allLetters.forEach($letter => {
+            $letter.classList.remove('correct', 'incorrect');
+        })
+
+        $input.value.split('').forEach((char, index) => {
+            const $letter = $allLetters[index];
+            const letterToCheck = currentWord[index];
+
+            const isCorrect = char === letterToCheck;
+            const letterClass = isCorrect ? 'correct' : 'incorrect';
+            $letter.classList.add(letterClass);
+        })
+
+        $currentLetter.classList.remove('active', 'is-last');
+        const inputLenght = $input.value.length;
+        const $nextActiveLetter = $allLetters[inputLenght];
+
+        if ($nextActiveLetter) {
+            $nextActiveLetter.classList.add('active');
+        } else {
+            $currentLetter.classList.add('active', 'is-last');
+        }
+    }
+
+    function gameOver() {
+        console.log('Game Over');
     }
 </script>
 </html>
